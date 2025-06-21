@@ -7,6 +7,15 @@ class Student:
         self.courses_in_progress = []
         self.grades = {}
 
+    def average_student_mark(self):
+        if not self.grades:
+            return 0
+        else:
+            all_grades = []
+            for grade in self.grades.values():
+                all_grades.extend(grade)
+        return round(sum(all_grades) / len(all_grades), 1)
+
     def rate_lecture(self, lecturer, course, grade):
         if (isinstance(lecturer, Lecturer)
                 and (course in self.finished_courses or course in self.courses_in_progress)
@@ -17,6 +26,32 @@ class Student:
                 lecturer.grades[course] = [grade]
         else:
             return 'Ошибка'
+
+    def __str__(self):
+        return (f"Имя: {self.name}\n"
+                f"Фамилия: {self.surname}\n"
+                f"Средняя оценка за домашние задания: {
+            self.average_student_mark()}\n"
+            f"Курсы в процессе изучения: {
+            ", ".join(
+                self.courses_in_progress)}\n"
+            f"Завершённые курсы: {", ".join(self.finished_courses)}")
+
+    def __eq__(self, other):
+        if not isinstance(other, Student):
+            return NotImplemented
+        return self.average_student_mark() == other.average_student_mark()
+
+    def __gt__(self, other):
+        if not isinstance(other, Student):
+            return NotImplemented
+        return self.average_student_mark() > other.average_student_mark()
+
+    def __ge__(self, other):
+        if not isinstance(other, Student):
+            return NotImplemented
+        return self.average_student_mark() >= other.average_student_mark()
+
 
 class Mentor:
     def __init__(self, name, surname):
@@ -30,6 +65,36 @@ class Lecturer(Mentor):
         super().__init__(name, surname)
         self.grades = {}
 
+    def __str__(self):
+        return (f"Имя: {self.name}\n"
+                f"Фамилия: {self.surname}\n"
+                f"Средняя оценка за лекции: {self.average_lecturer_mark()}")
+
+    def average_lecturer_mark(self):
+        if not self.grades:
+            return 0
+        else:
+            all_grades = []
+            for grade in self.grades.values():
+                all_grades.extend(grade)
+        return round(sum(all_grades) / len(all_grades), 1)
+
+    def __eq__(self, other):
+        if not isinstance(other, Lecturer):
+            return NotImplemented
+        return self.average_lecturer_mark() == other.average_lecturer_mark()
+
+    def __gt__(self, other):
+        if not isinstance(other, Lecturer):
+            return NotImplemented
+        return self.average_lecturer_mark() > other.average_lecturer_mark()
+
+    def __ge__(self, other):
+        if not isinstance(other, Lecturer):
+            return NotImplemented
+        return self.average_lecturer_mark() >= other.average_lecturer_mark()
+
+
 class Reviewer(Mentor):
     def rate_hw(self, student, course, grade):
         if (isinstance(student, Student)
@@ -42,36 +107,64 @@ class Reviewer(Mentor):
         else:
             return 'Ошибка'
 
-best_student = Student('Ruoy', 'Eman', 'your_gender')
-best_student.courses_in_progress += ['Python']
+    def __str__(self):
+        return (f"Имя: {self.name}\n"
+                f"Фамилия: {self.surname}")
 
-cool_reviewer = Reviewer('Some', 'Buddy')
-cool_reviewer.courses_attached += ['Python']
 
-cool_reviewer.rate_hw(best_student, 'Python', 10)
-cool_reviewer.rate_hw(best_student, 'Python', 10)
-cool_reviewer.rate_hw(best_student, 'Python', 10)
+lecturer_1 = Lecturer('Иван', 'Иванов')
+lecturer_2 = Lecturer('Алексей', 'Алексеевич')
+reviewer_1 = Reviewer('Пётр', 'Петров')
+student_1 = Student('Ольга', 'Алёхина', 'Ж')
+student_2 = Student('Михаил', 'Михайлович', 'М')
 
-print(best_student.grades)
+student_1.courses_in_progress += ['Python', 'Java', 'C++']
+student_1.finished_courses += ['Git']
+student_2.courses_in_progress += ['Python', 'C++', 'Java']
+student_2.finished_courses += ['Git']
+lecturer_1.courses_attached += ['Python', 'C++', 'Java']
+lecturer_2.courses_attached += ['Python', 'Java', 'C++']
+reviewer_1.courses_attached += ['Python', 'C++', 'Java']
 
-lecturer = Lecturer('Иван', 'Иванов')
-reviewer = Reviewer('Пётр', 'Петров')
-print(isinstance(lecturer, Mentor))
-print(isinstance(reviewer, Mentor))
-print(lecturer.courses_attached)
-print(reviewer.courses_attached)
+student_1.rate_lecture(lecturer_1, 'C++', 7)
+student_1.rate_lecture(lecturer_1, 'Python', 8)
+student_1.rate_lecture(lecturer_1, 'Java', 8)
+student_1.rate_lecture(lecturer_2, 'C++', 8)
+student_1.rate_lecture(lecturer_2, 'Python', 6)
+student_1.rate_lecture(lecturer_2, 'Java', 8)
+student_2.rate_lecture(lecturer_1, 'C++', 9)
+student_2.rate_lecture(lecturer_1, 'Python', 6)
+student_2.rate_lecture(lecturer_1, 'Java', 6)
+student_2.rate_lecture(lecturer_2, 'C++', 10)
+student_2.rate_lecture(lecturer_2, 'Python', 8)
+student_2.rate_lecture(lecturer_2, 'Java', 6)
 
-lecturer = Lecturer('Иван', 'Иванов')
-reviewer = Reviewer('Пётр', 'Петров')
-student = Student('Алёхина', 'Ольга', 'Ж')
+reviewer_1.rate_hw(student_1, 'Python', 10)
+reviewer_1.rate_hw(student_1, 'Java', 9)
+reviewer_1.rate_hw(student_1, 'C++', 10)
+reviewer_1.rate_hw(student_2, 'Python', 8)
+reviewer_1.rate_hw(student_2, 'Java', 7)
+reviewer_1.rate_hw(student_2, 'C++', 10)
 
-student.courses_in_progress += ['Python', 'Java']
-lecturer.courses_attached += ['Python', 'C++']
-reviewer.courses_attached += ['Python', 'C++']
+print(lecturer_1.grades)
+print(lecturer_2.grades)
 
-print(student.rate_lecture(lecturer, 'Python', 7))  # None
-print(student.rate_lecture(lecturer, 'Java', 8))  # Ошибка
-print(student.rate_lecture(lecturer, 'С++', 8))  # Ошибка
-print(student.rate_lecture(reviewer, 'Python', 6))  # Ошибка
+print(reviewer_1)
+print(lecturer_1)
+print(lecturer_2)
+print(student_1)
+print(student_2)
 
-print(lecturer.grades)  # {'Python': [7]}
+print(student_1 == student_2)
+print(student_1 != student_2)
+print(student_1 > student_2)
+print(student_1 < student_2)
+print(student_1 >= student_2)
+print(student_1 <= student_2)
+
+print(lecturer_1 == lecturer_2)
+print(lecturer_1 != lecturer_2)
+print(lecturer_1 > lecturer_2)
+print(lecturer_1 < lecturer_2)
+print(lecturer_1 >= lecturer_2)
+print(lecturer_1 <= lecturer_2)
