@@ -7,7 +7,7 @@ class Student:
         self.courses_in_progress = []
         self.grades = {}
 
-    def average_student_mark(self):
+    def average_student_grade(self):
         if not self.grades:
             return 0
         else:
@@ -31,7 +31,7 @@ class Student:
         return (f"Имя: {self.name}\n"
                 f"Фамилия: {self.surname}\n"
                 f"Средняя оценка за домашние задания: {
-            self.average_student_mark()}\n"
+            self.average_student_grade()}\n"
             f"Курсы в процессе изучения: {
             ", ".join(
                 self.courses_in_progress)}\n"
@@ -40,17 +40,17 @@ class Student:
     def __eq__(self, other):
         if not isinstance(other, Student):
             return NotImplemented
-        return self.average_student_mark() == other.average_student_mark()
+        return self.average_student_grade() == other.average_student_grade()
 
     def __gt__(self, other):
         if not isinstance(other, Student):
             return NotImplemented
-        return self.average_student_mark() > other.average_student_mark()
+        return self.average_student_grade() > other.average_student_grade()
 
     def __ge__(self, other):
         if not isinstance(other, Student):
             return NotImplemented
-        return self.average_student_mark() >= other.average_student_mark()
+        return self.average_student_grade() >= other.average_student_grade()
 
 
 class Mentor:
@@ -68,9 +68,9 @@ class Lecturer(Mentor):
     def __str__(self):
         return (f"Имя: {self.name}\n"
                 f"Фамилия: {self.surname}\n"
-                f"Средняя оценка за лекции: {self.average_lecturer_mark()}")
+                f"Средняя оценка за лекции: {self.average_lecturer_grade()}")
 
-    def average_lecturer_mark(self):
+    def average_lecturer_grade(self):
         if not self.grades:
             return 0
         else:
@@ -82,17 +82,17 @@ class Lecturer(Mentor):
     def __eq__(self, other):
         if not isinstance(other, Lecturer):
             return NotImplemented
-        return self.average_lecturer_mark() == other.average_lecturer_mark()
+        return self.average_lecturer_grade() == other.average_lecturer_grade()
 
     def __gt__(self, other):
         if not isinstance(other, Lecturer):
             return NotImplemented
-        return self.average_lecturer_mark() > other.average_lecturer_mark()
+        return self.average_lecturer_grade() > other.average_lecturer_grade()
 
     def __ge__(self, other):
         if not isinstance(other, Lecturer):
             return NotImplemented
-        return self.average_lecturer_mark() >= other.average_lecturer_mark()
+        return self.average_lecturer_grade() >= other.average_lecturer_grade()
 
 
 class Reviewer(Mentor):
@@ -110,6 +110,32 @@ class Reviewer(Mentor):
     def __str__(self):
         return (f"Имя: {self.name}\n"
                 f"Фамилия: {self.surname}")
+
+
+def average_students_grade_by_course(students, course):
+    sum_of_mark = 0
+    number_of_marks = 0
+    for student in students:
+        if course in student.grades:
+            sum_of_mark += sum(student.grades[course])
+            number_of_marks += len(student.grades[course])
+    if number_of_marks > 0:
+        return round(sum_of_mark / number_of_marks, 1)
+    else:
+        return 0
+
+
+def average_lecturer_grade_by_course(lecturers, course):
+    sum_of_mark = 0
+    number_of_marks = 0
+    for lecturer in lecturers:
+        if course in lecturer.grades:
+            sum_of_mark += sum(lecturer.grades[course])
+            number_of_marks += len(lecturer.grades[course])
+    if number_of_marks > 0:
+        return round(sum_of_mark / number_of_marks, 1)
+    else:
+        return 0
 
 
 lecturer_1 = Lecturer('Иван', 'Иванов')
@@ -168,3 +194,6 @@ print(lecturer_1 > lecturer_2)
 print(lecturer_1 < lecturer_2)
 print(lecturer_1 >= lecturer_2)
 print(lecturer_1 <= lecturer_2)
+
+print(average_lecturer_grade_by_course([lecturer_1, lecturer_2], 'Python'))
+print(average_students_grade_by_course([student_1, student_2], 'Python'))
